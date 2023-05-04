@@ -12,7 +12,6 @@ namespace WebApplication3.Models
         public string productTitle { get; set; }
         public int price { get; set; }
         public int stock { get; set; }
-        //public HttpPostedFileBase Images { get; set; }
         public string Image { get; set; }
     }
 }

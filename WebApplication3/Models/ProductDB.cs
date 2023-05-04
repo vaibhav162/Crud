@@ -6,6 +6,7 @@ using System.Data;
 using System.Linq;
 using System.Web;
 using WebApplication3.Models;
+using System.IO;
 
 namespace WebApplication3.Models
 {
@@ -18,6 +19,7 @@ namespace WebApplication3.Models
         //Return list of all Employees  
         public List<Product> ListAll()
         {
+            String path = @"D:\Crud\WebApplication3\";//Path
             List<Product> lst = new List<Product>();
             using (SqlConnection con = new SqlConnection(cs))
             {
@@ -33,7 +35,8 @@ namespace WebApplication3.Models
                         productTitle = rdr["producttitle"].ToString(),
                         stock = Convert.ToInt32(rdr["stock"]),
                         price = Convert.ToInt32(rdr["price"]),
-                      // Image = rdr["image"].ToString(),
+                       Image =  Path.Combine(path,rdr["image"].ToString()).ToString()
+                   
                     });
                 }
                 return lst;

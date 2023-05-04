@@ -1,8 +1,15 @@
-﻿<script src="~/Scripts/jquery-3.4.1.js"></script>
+﻿
+
+<script src="~/Scripts/jquery-3.4.1.js"></script>
 <script src="~/Scripts/jquery.validate.js"></script>
 <script src="~/Scripts/jquery.validate.unobtrusive.js"></script>
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.css" />
+
+<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.js"></script>
 <script type="text/javascript">
+
     $(document).ready(function () {
+        $('#myTable').DataTable();
         loadData();
     });
 
@@ -18,14 +25,15 @@
             success: function (result) {
                 var htmlss = '';
                 debugger;
-             
+
                 $.each(result, function (key, i) {
                     console.log(key);
                     console.log(i);
+
                     htmlss += '<tr>';
                     htmlss += '<td> ' + i.id + '</td > ';
-                    htmlss += '<td> ' + i.producttitle + '</td > ';
-                    htmlss += '<td> ' + i.Image + '</td > ';
+                    htmlss += '<td> ' + i.productTitle + '</td > ';
+                    htmlss += '<td>' + i.Image + '</td > ';
                     htmlss += '<td> ' + i.stock + '</td > ';
                     htmlss += '<td> ' + i.price + '</td > ';
                     htmlss += '<td> <a href="#" onclick="return getbyID(' + i.id + ')">Edit</a> | <a href="#" onclick="Delele(' + i.id + ')">Delete</a></td> ';
@@ -46,19 +54,28 @@
         if (res == false) {
             return false;
         }
-        var empObj = {
-            Id: $('#Id').val(),
-            Producttitle: $('#producttitle').val(),
-            Image: $('#image').val(),
-            Price: $('#price').val(),
-            Stock: $('#Stock').val()
-        };
+        var data = new FormData();
+
+        debugger;
+        var files = $("#image").get(0).files;
+
+        if (files.length > 0) {
+            data.append("Image", files[0]);
+        }
+
+        data.append("Id", $('#id').val());
+        data.append("Producttitle", $('#producttitle').val().trim());
+        data.append("Price", $('#price').val().trim());
+        data.append("Stock", $('#stock').val().trim());
+        data.append("Image", files[0]);
+
         $.ajax({
             url: "/Home/Add",
-            data: JSON.stringify(empObj),
+            data: data,
             type: "POST",
-            contentType: "application/json;charset=utf-8",
-            dataType: "json",
+            contentType: false,
+            processData: false,
+            // dataType: "json",
             success: function (result) {
                 loadData();
                 $('#myModal').modal('hide');
@@ -69,10 +86,10 @@
         });
     }
 
-   
+
     function getbyID(Id) {
         debugger;
-        $('#producttitle').css('border-color', 'lightgrey');
+        $('#productTitle').css('border-color', 'lightgrey');
         $('#image').css('border-color', 'lightgrey');
         $('#price').css('border-color', 'lightgrey');
         $('#Stock').css('border-color', 'lightgrey');
@@ -82,11 +99,11 @@
             contentType: "application/json;charset=UTF-8",
             dataType: "json",
             success: function (result) {
-                $('#Id').val(result.id);
-                $('#producttitle').val(result.producttitle);
-                $('#image').val(result.Image);
+                $('#id').val(result.id);
+                $('#productTitle').val(result.producttitle);
+                $('#Image').val(result.Image);
                 $('#price').val(result.price);
-                $('#Stock').val(result.stock);
+                $('#stock').val(result.stock);
 
                 $('#myModal').modal('show');
                 $('#btnUpdate').show();
@@ -99,24 +116,33 @@
         return false;
     }
 
- 
+
     function Update() {
         var res = validate();
         if (res == false) {
             return false;
         }
-        var empObj = {
-           ID: $('#Id').val(),
-            producttitle: $('#producttitle').val(),
-            image: $('#image').val(),
-            price: $('#price').val(),
-            stock: $('#stock').val(),
-        };
+        var data = new FormData();
+
+        debugger;
+        var files = $("#image").get(0).files;
+
+        if (files.length > 0) {
+            data.append("Image", files[0]);
+        }
+
+        data.append("Id", $('#id').val());
+        data.append("Producttitle", $('#producttitle').val().trim());
+        data.append("Price", $('#price').val().trim());
+        data.append("Stock", $('#stock').val().trim());
+        data.append("Image", files[0]);
+
         $.ajax({
             url: "/Home/Update",
-            data: JSON.stringify(empObj),
+            data: data,
             type: "POST",
-            contentType: "application/json;charset=utf-8",
+            contentType: false,
+            processData: false,
             dataType: "json",
             success: function (result) {
                 loadData();
@@ -133,7 +159,7 @@
         });
     }
 
-    //function for deleting 
+    //function for deleting
     function Delele(ID) {
         var ans = confirm("Are you sure you want to delete this Record?");
         if (ans) {
@@ -190,8 +216,8 @@
         else {
             $('#price').css('border-color', 'lightgrey');
         }
-        if ($('#Stock').val().trim() == "") {
-            $('#Stock').css('border-color', 'Red');
+        if ($('#stock').val().trim() == "") {
+            $('#stock').css('border-color', 'Red');
             isValid = false;
         }
         else {
@@ -205,7 +231,7 @@
     <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal" onclick="clearTextBox();">Add New product</button>
     <br />
     <br />
-    <table class="table table-bordered table-hover">
+    <table class="table table-bordered table-hover" id="mytable">
         <thead>
             <tr>
                 <th>
@@ -240,18 +266,19 @@
                 <h4 class="modal-title" id="myModalLabel">Add Product</h4>
             </div>
             <div class="modal-body">
-                <form>
+                <form enctype="multipart/form-data">
                     <div class="form-group">
-                        <label for="Id">ID</label>
-                        <input type="text" class="form-control" id="Id" placeholder="Id" disabled="disabled" />
+                        <label for="id">ID</label>
+                        <input type="text" class="form-control" id="id" placeholder="id" disabled="disabled" />
                     </div>
                     <div class="form-group">
                         <label for="producttitle">product title</label>
                         <input type="text" class="form-control" id="producttitle" placeholder="producttitle" />
                     </div>
                     <div class="form-group">
+                        s
                         <label for="image">image</label>
-                     
+
                         <input type="file" class="form-control" id="image" placeholder="image" />
                     </div>
                     <div class="form-group">
@@ -259,8 +286,8 @@
                         <input type="text" class="form-control" id="price" placeholder="price" />
                     </div>
                     <div class="form-group">
-                        <label for="Stock">Stock</label>
-                        <input type="text" class="form-control" id="Stock" placeholder="Stock" />
+                        <label for="stock">Stock</label>
+                        <input type="text" class="form-control" id="stock" placeholder="stock" />
                     </div>
                 </form>
             </div>
